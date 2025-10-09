@@ -10,7 +10,6 @@ export default function AdminLayout({
     <>
       <AccessibilityProvider>
         <div>
-          
         {children}
         </div>
       </AccessibilityProvider>
