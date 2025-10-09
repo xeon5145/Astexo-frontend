@@ -1,104 +1,97 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
-import Link from "next/link";
+import { useEffect } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useRouter } from "next/navigation";
+import NavbarDashboard from "@/components/common/navbarDashboard";
+import SideBar from "@/components/common/sideBar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Loader2, Shield } from "lucide-react";
 
-export default function CreateAccountPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
+export default function ClientDashboard() {
+  const { user, isLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsSuccess(false);
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/');
     }
+  }, [isLoading, isAuthenticated, router]);
 
-    try {
-      // TODO: Implement actual account creation API call
-      // For now, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+            <h2 className="text-lg font-semibold text-card-foreground mb-2">
+              Loading Dashboard
+            </h2>
+            <p className="text-sm text-muted-foreground text-center">
+              Please wait while we load your dashboard...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-      setIsSuccess(true);
-    } catch (err) {
-      setError("Failed to create account. Please try again.");
-    }
-  };
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Shield className="h-12 w-12 text-red-500 mb-4" />
+            <h2 className="text-lg font-semibold text-card-foreground mb-2">
+              Access Denied
+            </h2>
+            <p className="text-sm text-muted-foreground text-center">
+              Please log in to access your dashboard.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="max-w-md w-full space-y-8 p-8">
-        <form onSubmit={handleSubmit}>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <InputGroup>
-                <InputGroupInput
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </InputGroup>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <InputGroup>
-                <InputGroupInput
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </InputGroup>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-              <InputGroup>
-                <InputGroupInput
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirm your password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-              </InputGroup>
-            </Field>
-          </FieldGroup>
-          <div className="mt-6 text-center">
-            <Button type="submit" variant="primary">
-              Create Account
-            </Button>
-          </div>
-          <div className="mt-4 text-center">
-            <Link href="/">
-              <Button variant="outline">Already have an account?</Button>
-            </Link>
-          </div>
-        </form>
-        {error && <p className="mt-4 text-center text-red-500">{error}</p>}
-        {isSuccess && (
-          <div className="text-center">
-            <p className="mt-4 text-green-500">Account created successfully!</p>
-            <Link href="/">
-              <Button>Login</Button>
-            </Link>
-          </div>
-        )}
+    <div className="min-h-screen bg-background">
+      <div className="flex">
+        {/* Sidebar */}
+        <SideBar />
+        
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          <NavbarDashboard />
+          
+          {/* Dashboard Content */}
+          <main className="flex-1 p-6">
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-2xl font-bold text-card-foreground">
+                  Welcome back, {user?.name}!
+                </h1>
+                <p className="text-muted-foreground">Manage your account and access your features.</p>
+              </div>
+              
+              {/* Placeholder content - you can expand this */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-card border border-border rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-card-foreground mb-2">Feature 1</h3>
+                  <p className="text-muted-foreground">Description of feature 1</p>
+                </div>
+                <div className="bg-card border border-border rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-card-foreground mb-2">Feature 2</h3>
+                  <p className="text-muted-foreground">Description of feature 2</p>
+                </div>
+                <div className="bg-card border border-border rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-card-foreground mb-2">Feature 3</h3>
+                  <p className="text-muted-foreground">Description of feature 3</p>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );
