@@ -24,6 +24,7 @@ import {
 import { useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginBox() {
   const [inputType, setInputType] = useState("password");
@@ -43,7 +44,7 @@ export default function LoginBox() {
     setError("");
 
     const result = await login(email, password);
-    
+
     if (result.success && result.redirectTo) {
       setIsOpen(false);
       router.push(result.redirectTo);
@@ -52,23 +53,26 @@ export default function LoginBox() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
+  const dashboardLink = () => {
+    console.log(user);
+    if (user?.role === "admin") {
+      return "/admin";
+    } else {
+      return "/client";
+    }
   };
 
-  // If user is authenticated, show logout button
+  // If user is authenticated, show Dashboard button
   if (isAuthenticated && user) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">
-          Welcome, {user.name}
-        </span>
-        <Button variant="outline" onClick={handleLogout}>
-          Logout
-        </Button>
+        <Link href={dashboardLink()}>
+          <Button variant="default">Dashboard</Button>
+        </Link>
       </div>
     );
   }
+  // If user is authenticated, show Dashboard button
 
   return (
     <>
@@ -83,7 +87,7 @@ export default function LoginBox() {
           <DialogHeader>
             <DialogTitle>Login to your account</DialogTitle>
           </DialogHeader>
-          
+
           <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
@@ -131,13 +135,13 @@ export default function LoginBox() {
                   </InputGroupAddon>
                 </InputGroup>
               </Field>
-              
+
               {error && (
                 <div className="p-3 rounded-md bg-red-50 border border-red-200">
                   <p className="text-sm text-red-800">{error}</p>
                 </div>
               )}
-              
+
               <Field>
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? (

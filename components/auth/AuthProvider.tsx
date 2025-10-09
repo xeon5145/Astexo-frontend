@@ -7,7 +7,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'user' | 'admin' | 'super_admin';
+  role: 'user' | 'admin' ;
   permissions?: string[];
 }
 
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           id: '1',
           name: 'John Admin',
           email: 'admin@astexo.com',
-          role: 'super_admin',
+          role: 'admin',
           permissions: ['users.read', 'users.write', 'users.delete', 'analytics.read', 'settings.write']
         };
         redirectTo = '/admin';
@@ -118,7 +118,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const isAdmin = (): boolean => {
-    return user?.role === 'admin' || user?.role === 'super_admin';
+    return user?.role === 'admin';
   };
 
   const value: AuthContextType = {

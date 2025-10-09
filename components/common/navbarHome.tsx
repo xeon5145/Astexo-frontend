@@ -1,6 +1,6 @@
 "use client";
 
-import LoginBox from "./loginBox";
+import LoginBox from "../auth/loginBox";
 import ModeToggle from "./themeToggle";
 
 export default function NavbarHome() {

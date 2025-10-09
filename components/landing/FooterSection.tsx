@@ -184,7 +184,7 @@ export default function FooterSection() {
         {/* Bottom Bar */}
         <div className="py-6 border-t flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-sm">
-            © 2024 Astexo. All rights reserved.
+            © 2025 Astexo. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
             <span>Made with ❤️ for businesses worldwide</span>
