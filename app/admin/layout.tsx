@@ -12,19 +12,19 @@ export default function AdminLayout({
     <AccessibilityProvider>
       <div className="flex h-screen w-full overflow-hidden">
         {/* Sidebar */}
-        <div className="basis-2/12 overflow-y-auto bg-slate-100">
+        <div className="basis-2/12 overflow-y-auto bg-secondary p-4">
           <AdminSidebar2 />
         </div>
 
         {/* Main Content */}
-        <div className="basis-10/12 flex flex-col overflow-y-auto bg-slate-50 shadow-lg ">
+        <div className="basis-10/12 flex flex-col overflow-y-auto shadow-lg p-4">
           {/* Sticky Navbar */}
-          <div className="sticky top-4 z-10">
+          <div className="sticky z-10">
             <NavbarDashboard />
           </div>
 
           {/* Page Content */}
-          <div className="p-4 mt-4">{children}</div>
+          <div className="mt-6">{children}</div>
         </div>
       </div>
     </AccessibilityProvider>

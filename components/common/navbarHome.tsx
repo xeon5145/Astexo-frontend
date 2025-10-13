@@ -2,6 +2,7 @@
 
 import LoginBox from "../auth/loginBox";
 import ModeToggle from "./themeToggle";
+// import NavigationMenuRow from "@/components/common/navigationMenu";
 
 export default function NavbarHome() {
   return (
@@ -12,6 +13,7 @@ export default function NavbarHome() {
         </div>
 
         <div className="basis-4/6 flex justify-end items-center gap-4">
+          {/* <NavigationMenuRow /> */}
           <ModeToggle />
           <LoginBox />
         </div>
