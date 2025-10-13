@@ -16,9 +16,15 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell } from "lucide-react";
+import { Bell,LogOut } from "lucide-react";
+import { useAuth } from "../auth/AuthProvider";
 
 export default function NavbarDashboard() {
+    const { user, logout } = useAuth();
+
+    const handleLogout = () => {
+    logout();
+  };
   return (
     <>
       <div className="z-50 h-16 flex flex-row items-center bg-fuchsia-900/20 backdrop-blur-xs p-4 rounded-md">
@@ -42,7 +48,8 @@ export default function NavbarDashboard() {
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}  variant="destructive">
+                  <LogOut />
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
