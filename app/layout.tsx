@@ -16,8 +16,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Astexo - Your Application",
+  title: "Astexo",
   description: "Astexo application with admin and client dashboards",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

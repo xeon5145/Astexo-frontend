@@ -16,13 +16,14 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Bell,LogOut } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
 import { useAuth } from "../auth/AuthProvider";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function NavbarDashboard() {
-    const { user, logout } = useAuth();
+  const { user, logout } = useAuth();
 
-    const handleLogout = () => {
+  const handleLogout = () => {
     logout();
   };
   return (
@@ -31,11 +32,23 @@ export default function NavbarDashboard() {
         <div className="ml-auto flex flex-row gap-2">
           <Button variant="outline"><Bell /></Button>
           <ModeToggle />
-          <div className="">
+          {/* User Menu */}
+          <div className="mx-2 cursor-pointer">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">User Menu</Button>
+                {/* User Avatar */}
+                <div className="flex flex-row items-center">
+                  <Avatar>
+                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col text-xs text-left">
+                    <p className="ml-2">{user?.name}</p>
+                    <p className="ml-2">{user?.email}</p>
+                  </div>
+                </div>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent className="w-56" align="start">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuGroup>
@@ -48,13 +61,15 @@ export default function NavbarDashboard() {
                 </DropdownMenuGroup>
 
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}  variant="destructive">
+                <DropdownMenuItem onClick={handleLogout} variant="destructive">
                   <LogOut />
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          {/* User Menu */}
+
         </div>
       </div>
     </>
