@@ -8,8 +8,8 @@ export default function AdminSidebar2() {
         <>
             {/* Header */}
             <div className="p-4">
-                <h2 className="text-2xl font-bold text-sidebar-foreground">Astexo</h2>
-                <p className="text-xs">Admin</p>
+                <h2 className="text-2xl text-primary font-bold">Astexo</h2>
+                <p className="text-xs text-primary">Admin</p>
             </div>
 
             {/* Navigation */}

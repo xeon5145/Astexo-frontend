@@ -9,7 +9,7 @@ export default function MenuItem({ link, variant = "ghost", text , icon }: { lin
     return (
         <li>
             <Link href={link}>
-                    <Button variant={variant} className="w-full justify-start hover:bg-fuchsia-900/20">
+                    <Button variant={variant} className="w-full justify-start hover:bg-purple-900/15 text-primary hover:text-primary">
                     <IconComponent className="mr-2 h-4 w-4" />
                         {text}
                     </Button>

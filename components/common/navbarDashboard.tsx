@@ -1,4 +1,4 @@
-"use client";
+  "use client";
 
 import ModeToggle from "@/components/common/themeToggle";
 import { Button } from "@/components/ui/button";
@@ -28,21 +28,21 @@ export default function NavbarDashboard() {
   };
   return (
     <>
-      <div className="z-50 h-16 flex flex-row items-center bg-fuchsia-900/20 backdrop-blur-xs p-4 rounded-md">
-        <div className="ml-auto flex flex-row gap-2">
-          <Button variant="outline"><Bell /></Button>
+      <div className="z-50 h-16 flex flex-row items-center bg-purple-900/15 backdrop-blur-xs p-4 rounded-md">
+        <div className="ml-auto flex flex-row gap-2 items-center">
+          <Button className="text-primary hover:text-primary" variant="outline"><Bell /></Button>
           <ModeToggle />
           {/* User Menu */}
-          <div className="mx-2 cursor-pointer">
+          <div className="ml-2 cursor-pointer">
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild className="bg-purple-900/20 rounded-sm p-2">
                 {/* User Avatar */}
                 <div className="flex flex-row items-center">
                   <Avatar>
                     <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
-                  <div className="flex flex-col text-xs text-left">
+                  <div className="flex flex-col text-xs text-left text-primary">
                     <p className="ml-2">{user?.name}</p>
                     <p className="ml-2">{user?.email}</p>
                   </div>
