@@ -3,7 +3,7 @@ import { ArrowLeft, LogOut } from "lucide-react";
 import Link from "next/link";
 import MenuItem from "@/components/common/menuItem";
 
-export default function AdminSidebar2() {
+export default function AdminSidebar() {
     return (
         <>
             {/* Header */}
@@ -16,12 +16,7 @@ export default function AdminSidebar2() {
             <nav className="mt-2">
                 <ul className="space-y-2">               
                     <MenuItem link={'/admin'}text={'Dashboard'} icon={'LayoutDashboard'} />
-                    <MenuItem link={'/admin/users'} text={'Users'} icon={'Users'} />
-                    <MenuItem link={'/admin/roles'} text={'Roles'} icon={'Shield'} />
-                    <MenuItem link={'/admin/permissions'} text={'Permissions'} icon={'ShieldCheck'} />
-                    <MenuItem link={'/admin/audit-logs'} text={'Audit Logs'} icon={'FileText'} />
-                    <MenuItem link={'/admin/notifications'} text={'Notifications'} icon={'Bell'} />
-                    <MenuItem link={'/admin/settings'} text={'Settings'} icon={'Settings'} />
+                    <MenuItem link={'/admin/clients'} text={'clients'} icon={'Users'} />
                 </ul>
             </nav>
 

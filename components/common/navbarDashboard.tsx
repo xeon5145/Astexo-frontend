@@ -35,7 +35,7 @@ export default function NavbarDashboard() {
           {/* User Menu */}
           <div className="ml-2 cursor-pointer">
             <DropdownMenu>
-              <DropdownMenuTrigger asChild className="bg-purple-900/20 rounded-sm p-2">
+              <DropdownMenuTrigger asChild className="bg-purple-900/0 hover:bg-purple-900/10 rounded-sm p-2">
                 {/* User Avatar */}
                 <div className="flex flex-row items-center">
                   <Avatar>

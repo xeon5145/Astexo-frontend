@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { useState } from "react";
-import { useAuth } from "../auth/AuthProvider";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 

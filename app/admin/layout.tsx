@@ -1,6 +1,6 @@
-import "./accessibility.css";
-import { AccessibilityProvider } from "@/components/admin/AccessibilityProvider";
-import AdminSidebar2 from "@/components/admin/AdminSidebar2";
+import "../../assets/css/accessibility.css";
+import { AccessibilityProvider } from "./components/AccessibilityProvider";
+import AdminSidebar from "./components/AdminSidebar";
 import NavbarDashboard from "@/components/common/navbarDashboard";
 
 export default function AdminLayout({
@@ -13,7 +13,7 @@ export default function AdminLayout({
       <div className="flex h-screen w-full overflow-hidden">
         {/* Sidebar */}
         <div className="basis-2/12 overflow-y-auto bg-secondary p-4">
-          <AdminSidebar2 />
+          <AdminSidebar />
         </div>
 
         {/* Main Content */}
