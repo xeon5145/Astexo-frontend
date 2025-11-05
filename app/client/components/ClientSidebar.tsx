@@ -22,9 +22,9 @@ export default function AdminSidebar() {
             <nav className="mt-2">
                 <ul className="space-y-2">
                     <MenuItem link={'/client'} text={'Dashboard'} icon={'LayoutDashboard'} />
-                    <MenuItem type="menu" link={'/client/inventory-management'} text={'Inventory Management'} icon={'PackageOpen'}
+                    <MenuItem type="menu"  text={'Inventory Management'} icon={'PackageOpen'}
                         menuItems={[
-                            { link: '/client/invoice-management/create', text: 'Create Invoice', icon: 'Plus' },
+                            { link: 'client/inventory-management', text: 'Dashboard', icon: 'LayoutDashboard' },
                             { link: '/client/invoice-management/list', text: 'Invoice List', icon: 'List' },
                             { link: '/client/invoice-management/templates', text: 'Templates', icon: 'FileText' },
                             { link: '/client/invoice-management/reports', text: 'Reports', icon: 'BarChart' }

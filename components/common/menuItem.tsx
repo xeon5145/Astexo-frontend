@@ -10,7 +10,7 @@ import {
 
 
 
-export default function MenuItem({ type = "item", link, variant = "ghost", text, icon , menuItems = [] }: { type?: "item" | "menu"; link: string; variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined; text: string; icon: keyof typeof Icons; menuItems?: Array<{ link: string; text: string; icon: keyof typeof Icons }> }) {
+export default function MenuItem({ type = "item", link, variant = "ghost", text, icon , menuItems = [] }: { type?: "item" | "menu"; link?: string; variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined; text: string; icon: keyof typeof Icons; menuItems?: Array<{ link: string; text: string; icon: keyof typeof Icons }> }) {
     const IconComponent = Icons[icon] as React.ComponentType<{ className?: string }>;
 
     return (
