@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(req: NextRequest) {
-    const role = req.cookies.get('role')?.value || 'client';
+    const role = req.cookies.get('role')?.value || 'admin';
     const { pathname } = req.nextUrl
 
     // Protect routes based on role
