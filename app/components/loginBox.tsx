@@ -54,8 +54,7 @@ export default function LoginBox() {
   };
 
   const dashboardLink = () => {
-    console.log(user);
-    if (user?.role === "admin") {
+    if (user?.account_type == 0) {
       return "/admin";
     } else {
       return "/client";

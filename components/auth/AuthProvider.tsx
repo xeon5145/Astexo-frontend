@@ -2,12 +2,15 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { api } from '@/lib/api';
+import { setAuthCookie, deleteAuthCookie } from '@/app/actions/auth';
 
 interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  role: 'user' | 'admin' ;
+  account_type: 0 | 1;
+  role: number;
   permissions?: string[];
 }
 
@@ -16,7 +19,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; redirectTo?: string }>;
-  logout: () => void;
+  logout: () => Promise<void>;
   isAdmin: () => boolean;
 }
 
@@ -48,7 +51,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const token = localStorage.getItem('auth_token');
       const userData = localStorage.getItem('user_data');
-      
+
       if (token && userData) {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
@@ -62,63 +65,58 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; redirectTo?: string }> => {
+  const login = async (email: string, password: string):
+    Promise<{ success: boolean; redirectTo?: string }> => {
     try {
       setIsLoading(true);
-      
-      // Mock authentication - replace with real API call
-      let mockUser: User;
-      let redirectTo: string;
+      const res = await api.post<{ message: string; token: string }>('/auth/login', {
+        email, password,
+      });
 
-      // Admin login
-      if (email === 'admin@astexo.com' && password === 'admin123') {
-        mockUser = {
-          id: '1',
-          name: 'John Admin',
-          email: 'admin@astexo.com',
-          role: 'admin',
-          permissions: ['users.read', 'users.write', 'users.delete', 'analytics.read', 'settings.write']
-        };
-        redirectTo = '/admin';
-      }
-      // Regular user login
-      else if (email === 'user@astexo.com' && password === 'user123') {
-        mockUser = {
-          id: '2',
-          name: 'John User',
-          email: 'user@astexo.com',
-          role: 'user'
-        };
-        redirectTo = '/client';
-      }
-      // Invalid credentials
-      else {
+      if (!res.token) {
         return { success: false };
       }
-      
-      // Store auth data
-      localStorage.setItem('auth_token', 'mock_token_123');
-      localStorage.setItem('user_data', JSON.stringify(mockUser));
-      
-      setUser(mockUser);
+
+      const payload = JSON.parse(atob(res.token.split('.')[1]));
+
+      const userData: User = {
+        id: payload.id,
+        name: payload.name || 'User',
+        email: payload.email,
+        role: payload.role,
+        account_type: payload.account_type,
+      };
+
+      localStorage.setItem('auth_token', res.token);
+      localStorage.setItem('user_data', JSON.stringify(userData));
+
+      // Set cookie for middleware route protection
+      await setAuthCookie(payload.account_type);
+
+      setUser(userData);
+
+      const redirectTo = userData.account_type === 0 ? '/admin' : '/client';
       return { success: true, redirectTo };
+
     } catch (error) {
       console.error('Login failed:', error);
       return { success: false };
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
-  const logout = () => {
+
+  const logout = async () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_data');
+    await deleteAuthCookie();
     setUser(null);
     router.push('/');
   };
 
   const isAdmin = (): boolean => {
-    return user?.role === 'admin';
+    return user?.account_type === 0;
   };
 
   const value: AuthContextType = {
