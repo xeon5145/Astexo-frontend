@@ -106,6 +106,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  const createAccount = async (name: string, email: string, password: string):
+    Promise<{ success: boolean; data: string; redirectTo?: string }> => {
+    try {
+      setIsLoading(true);
+      const res = await api.post<{
+        message: string, user: string
+      }>('/auth/register', {
+        name, email, password,
+      });
+
+      if (!res.user) {
+        return { success: false };
+      }
+
+      const userData:  User = {
+        name: name,
+        email: email,
+      };
+
+      return { success: true , data: userData , 'email-verification'};
+    }
+  }
+
 
   const logout = async () => {
     localStorage.removeItem('auth_token');
@@ -134,3 +157,4 @@ export function AuthProvider({ children }: AuthProviderProps) {
     </AuthContext.Provider>
   );
 }
+

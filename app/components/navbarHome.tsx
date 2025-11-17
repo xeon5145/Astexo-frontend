@@ -16,7 +16,7 @@ export default function NavbarHome() {
         </div>
 
         <div className="flex items-center gap-4">
-          <NavigationMenuRow />
+          {/* <NavigationMenuRow /> */}
           <ModeToggle />
           <LoginBox />
         </div>

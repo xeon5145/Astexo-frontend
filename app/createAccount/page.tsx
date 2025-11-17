@@ -7,7 +7,6 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 import { Eye, EyeClosed, Loader2, UserPlus } from "lucide-react";
 import Link from "next/link";
-import NavbarHome from "@/app/components/navbarHome";
 
 export default function CreateAccountPage() {
   const [email, setEmail] = useState("");
@@ -40,7 +39,23 @@ export default function CreateAccountPage() {
     try {
       // TODO: Implement actual account creation API call
       // For now, simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create account');
+      }
+
 
       setIsSuccess(true);
     } catch (err) {
@@ -54,12 +69,12 @@ export default function CreateAccountPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-      
+
       {/* Navigation */}
-      <NavbarHome />
+      {/* <NavbarHome /> */}
 
       {/* Main Content */}
-      <div className="relative z-10 flex items-center justify-center px-4 py-8">
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
         <Card className="w-full max-w-sm p-6 shadow-2xl bg-card/80 backdrop-blur-sm border-2">
           {!isSuccess ? (
             <>
@@ -133,9 +148,9 @@ export default function CreateAccountPage() {
                 )}
 
                 {/* Submit Button */}
-                <Button 
-                  type="submit" 
-                  className="w-full" 
+                <Button
+                  type="submit"
+                  className="w-full"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -187,7 +202,7 @@ export default function CreateAccountPage() {
       </div>
 
       {/* Footer */}
-      <div className="relative z-10 text-center pb-6">
+      <div className="absolute bottom-6 left-0 right-0 z-10 text-center">
         <p className="text-xs text-muted-foreground">
           By creating an account, you agree to our Terms of Service and Privacy Policy
         </p>
