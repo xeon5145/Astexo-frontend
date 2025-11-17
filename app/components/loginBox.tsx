@@ -106,7 +106,7 @@ export default function LoginBox() {
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                   <a
-                    href="/resetPassword"
+                    href="/reset-password"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
@@ -153,7 +153,7 @@ export default function LoginBox() {
                   )}
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="/createAccount">Sign up</a>
+                  Don&apos;t have an account? <a href="/create-account">Sign up</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>

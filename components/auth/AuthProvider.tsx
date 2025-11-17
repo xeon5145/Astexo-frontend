@@ -107,7 +107,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const createAccount = async (name: string, email: string, password: string):
-    Promise<{ success: boolean; data: string; redirectTo?: string }> => {
+    Promise<{ success: boolean; data?: any; redirectTo?: string }> => {
     try {
       setIsLoading(true);
       const res = await api.post<{
@@ -120,12 +120,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return { success: false };
       }
 
-      const userData:  User = {
+      const userData = {
         name: name,
         email: email,
       };
 
-      return { success: true , data: userData , 'email-verification'};
+      return { success: true, data: userData, redirectTo: 'email-verification' };
+    } catch (error) {
+      console.error('Registration failed:', error);
+      return { success: false };
+    } finally {
+      setIsLoading(false);
     }
   }
 

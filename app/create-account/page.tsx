@@ -3,20 +3,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
-import { Eye, EyeClosed, Loader2, UserPlus } from "lucide-react";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
+import { Loader2, UserPlus } from "lucide-react";
 import Link from "next/link";
+import { api } from '@/lib/api';
 
 export default function CreateAccountPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,42 +22,16 @@ export default function CreateAccountPage() {
     setIsSuccess(false);
     setIsLoading(true);
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      // TODO: Implement actual account creation API call
-      // For now, simulate API call
-      // await new Promise(resolve => setTimeout(resolve, 2000));
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+      const response = await api.post('/auth/register', {
+        name,
+        email,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create account');
-      }
-
-
+      console.log(response);
       setIsSuccess(true);
     } catch (err) {
-      setError("Failed to create account. Please try again.");
+      setError(err instanceof Error ? err.message : "Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -95,6 +67,21 @@ export default function CreateAccountPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <FieldGroup>
                   <Field>
+                    <FieldLabel htmlFor="name">Name</FieldLabel>
+                    <InputGroup>
+                      <InputGroupInput
+                        id="name"
+                        type="text"
+                        placeholder="You Name"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        disabled={isLoading}
+                      />
+                    </InputGroup>
+                  </Field>
+
+                  <Field>
                     <FieldLabel htmlFor="email">Email Address</FieldLabel>
                     <InputGroup>
                       <InputGroupInput
@@ -107,35 +94,6 @@ export default function CreateAccountPage() {
                         disabled={isLoading}
                       />
                     </InputGroup>
-                  </Field>
-
-                  <Field>
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <InputGroup>
-                      <InputGroupInput
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Create a strong password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={isLoading}
-                      />
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupButton
-                          type="button"
-                          aria-label="Toggle password visibility"
-                          size="icon-xs"
-                          onClick={() => setShowPassword(!showPassword)}
-                          disabled={isLoading}
-                        >
-                          {showPassword ? <Eye className="h-4 w-4" /> : <EyeClosed className="h-4 w-4" />}
-                        </InputGroupButton>
-                      </InputGroupAddon>
-                    </InputGroup>
-                    <FieldDescription>
-                      Must be at least 6 characters long
-                    </FieldDescription>
                   </Field>
 
                 </FieldGroup>
@@ -180,20 +138,20 @@ export default function CreateAccountPage() {
           ) : (
             /* Success State */
             <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
-                <UserPlus className="h-6 w-6 text-green-600" />
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-3">
+                <UserPlus className="h-6 w-6 text-blue-600" />
               </div>
               <div>
                 <h2 className="text-xl font-bold tracking-tight text-card-foreground mb-2">
-                  Account Created Successfully!
+                  Verify Your Email Address
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Welcome to Astexo! You can now sign in to your new account.
+                  We've sent a verification link to your registered email address. Please check your inbox and click the link to activate your account.
                 </p>
               </div>
               <Link href="/">
                 <Button className="w-full">
-                  Continue to Login
+                  Back to Login
                 </Button>
               </Link>
             </div>
