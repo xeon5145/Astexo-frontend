@@ -8,6 +8,7 @@ import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Loader2, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { api } from '@/lib/api';
+import { toast } from "sonner";
 
 export default function CreateAccountPage() {
   const [email, setEmail] = useState("");
@@ -23,15 +24,21 @@ export default function CreateAccountPage() {
     setIsLoading(true);
 
     try {
-      const response = await api.post('/auth/register', {
+      await api.post('/auth/register', {
         name,
         email,
       });
 
-      console.log(response);
+      toast.success("Account created successfully!", {
+        description: "Please check your email to verify your account.",
+      });
       setIsSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create account. Please try again.");
+      const errorMessage = err instanceof Error ? err.message : "Failed to create account. Please try again.";
+      setError(errorMessage);
+      toast.error("Account creation failed", {
+        description: errorMessage,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -111,6 +118,8 @@ export default function CreateAccountPage() {
                   className="w-full"
                   disabled={isLoading}
                 >
+
+                  
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
