@@ -1,134 +1,116 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, Mail, CheckCircle2 } from "lucide-react";
+import { Loader2, Mail, CheckCircle2, XCircle } from "lucide-react";
 import Link from "next/link";
 import { api } from '@/lib/api';
+import { useSearchParams } from "next/navigation";
 
 export default function EmailVerificationPage() {
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [userData, setUserData] = useState<any>(null);
-  const [token, setToken] = useState<string | null>();
-
+  const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [verificationStatus, setVerificationStatus] = useState<"pending" | "success" | "error">("pending");
+  const [message, setMessage] = useState("Verifying your email address...");
 
   useEffect(() => {
-    // Auto-focus first input on mount
-    inputRefs.current[0]?.focus();
-  }, []);
+    const token = searchParams.get('token');
 
-  const getUserData = async (token: string) => {
-    try {
-      const response = await api.post('/auth/get-token-data', {
-        token,
-      });
-
-      if (!response) {
-        throw new Error('Failed to fetch user data');
-      }
-
-      setUserData(response.data);
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      throw error;
-    }
-  };
-
-  const handleInputChange = (index: number, value: string) => {
-    // Only allow numbers
-    if (value && !/^\d$/.test(value)) return;
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-    setError("");
-
-    // Auto-focus next input
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData("text").slice(0, 6);
-
-    if (!/^\d+$/.test(pastedData)) return;
-
-    const newOtp = [...otp];
-    pastedData.split("").forEach((char, index) => {
-      if (index < 6) newOtp[index] = char;
-    });
-    setOtp(newOtp);
-
-    // Focus last filled input or next empty
-    const nextIndex = Math.min(pastedData.length, 5);
-    inputRefs.current[nextIndex]?.focus();
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    const otpValue = otp.join("");
-
-    if (otpValue.length !== 6) {
-      setError("Please enter all 6 digits");
+    if (!token) {
+      setVerificationStatus("error");
+      setMessage("Verification token is missing. Please ensure you clicked the full link from your email.");
       setIsLoading(false);
       return;
     }
 
-    try {
-      // TODO: Implement actual OTP verification API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+    const verifyEmail = async () => {
+      setIsLoading(true);
+      setVerificationStatus("pending");
+      setMessage("Verifying your email address...");
 
-      // Simulate validation
-      if (otpValue === "123456") {
-        setSuccess(true);
-      } else {
-        setError("Invalid verification code. Please try again.");
+      try {
+        // Assuming the backend has an endpoint like /auth/verify-email that accepts the token
+        // and finalizes the account creation.
+        const response = await api.post('/auth/verify-email', { token });
+
+        if (response) {
+          setVerificationStatus("success");
+          setMessage("Your email has been successfully verified! You can now access your account.");
+        } else {
+          // Handle case where API returns a non-error response but verification failed (e.g., token expired)
+          setVerificationStatus("error");
+          setMessage("Verification failed. The token may be invalid or expired. Please try registering again or contact support.");
+        }
+      } catch (err: any) {
+        setVerificationStatus("error");
+        // Use a more user-friendly error message from the API if available
+        const errorMessage = err.message || "An unexpected error occurred during verification.";
+        setMessage(errorMessage);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      setError("Failed to verify code. Please try again.");
-    } finally {
-      setIsLoading(false);
+    };
+
+    verifyEmail();
+  }, [searchParams]);
+
+  const renderContent = () => {
+    switch (verificationStatus) {
+      case "pending":
+        return (
+          <div className="text-center space-y-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-3">
+              <Loader2 className="h-8 w-8 text-primary animate-spin" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-card-foreground mb-2">
+                Email Verification
+              </h2>
+              <p className="text-sm text-muted-foreground">{message}</p>
+            </div>
+          </div>
+        );
+      case "success":
+        return (
+          <div className="text-center space-y-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-3">
+              <CheckCircle2 className="h-8 w-8 text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-card-foreground mb-2">
+                Email Verified!
+              </h2>
+              <p className="text-sm text-muted-foreground">{message}</p>
+            </div>
+            <Link href="/">
+              <Button className="w-full">
+                Continue to Dashboard
+              </Button>
+            </Link>
+          </div>
+        );
+      case "error":
+        return (
+          <div className="text-center space-y-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-3">
+              <XCircle className="h-8 w-8 text-red-600" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight text-card-foreground mb-2">
+                Verification Failed
+              </h2>
+              <p className="text-sm text-muted-foreground">{message}</p>
+            </div>
+            <Link href="/create-account">
+              <Button variant="outline" className="w-full">
+                Try Registering Again
+              </Button>
+            </Link>
+          </div>
+        );
     }
   };
-
-  const handleResend = async () => {
-    setResendCooldown(60);
-    setError("");
-
-    try {
-      // TODO: Implement actual resend OTP API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    } catch (err) {
-      setError("Failed to resend code. Please try again.");
-    }
-  };
-
-
-  // On page load
-  useEffect(() => {
-    const urlToken = new URLSearchParams(window.location.search).get('token');
-    getUserData(urlToken as string).catch(console.error);
-
-  }, []);
-  // On page load
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 relative overflow-hidden">
@@ -138,110 +120,7 @@ export default function EmailVerificationPage() {
       {/* Main Content */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
         <Card className="w-full max-w-md p-6 shadow-2xl bg-card/80 backdrop-blur-sm border-2">
-          {!success ? (
-            <>
-              {/* Header */}
-              <div className="text-center mb-6">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full mb-3">
-                  <Mail className="h-6 w-6 text-primary" />
-                </div>
-                <h2 className="text-2xl font-bold tracking-tight text-card-foreground">
-                  Verify Your Email
-                </h2>
-                <p className="text-sm text-muted-foreground mt-2">
-                  We've sent a 6-digit verification code to
-                </p>
-                <p className="text-sm font-medium text-card-foreground mt-1">
-                  your@email.com
-                </p>
-              </div>
-
-              {/* OTP Form */}
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* OTP Input */}
-                <div className="flex justify-center gap-2">
-                  {otp.map((digit, index) => (
-                    <input
-                      key={index}
-                      ref={(el) => (inputRefs.current[index] = el)}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleInputChange(index, e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(index, e)}
-                      onPaste={handlePaste}
-                      disabled={isLoading}
-                      className="w-12 h-14 text-center text-xl font-semibold border-2 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
-                  ))}
-                </div>
-
-                {/* Error Message */}
-                {error && (
-                  <div className="p-3 rounded-md bg-red-50 border border-red-200">
-                    <p className="text-sm text-red-800">{error}</p>
-                  </div>
-                )}
-
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading || otp.join("").length !== 6}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Verifying...
-                    </>
-                  ) : (
-                    "Verify Email"
-                  )}
-                </Button>
-
-                {/* Resend Code */}
-                <div className="text-center">
-                  <p className="text-sm text-muted-foreground">
-                    Didn't receive the code?{" "}
-                    {resendCooldown > 0 ? (
-                      <span className="text-muted-foreground">
-                        Resend in {resendCooldown}s
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={handleResend}
-                        className="text-primary hover:underline font-medium"
-                      >
-                        Resend code
-                      </button>
-                    )}
-                  </p>
-                </div>
-              </form>
-            </>
-          ) : (
-            /* Success State */
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-3">
-                <CheckCircle2 className="h-8 w-8 text-green-600" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight text-card-foreground mb-2">
-                  Email Verified!
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Your email has been successfully verified. You can now access your account.
-                </p>
-              </div>
-              <Link href="/">
-                <Button className="w-full">
-                  Continue to Dashboard
-                </Button>
-              </Link>
-            </div>
-          )}
+          {renderContent()}
         </Card>
       </div>
 
