@@ -32,6 +32,7 @@ export default function CreateAccountPage() {
       toast.success("Account created successfully!", {
         description: "Please check your email to verify your account.",
       });
+      
       setIsSuccess(true);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to create account. Please try again.";

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2, Mail, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { api } from '@/lib/api';
 
 export default function EmailVerificationPage() {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
@@ -13,18 +14,31 @@ export default function EmailVerificationPage() {
   const [success, setSuccess] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [userData, setUserData] = useState<any>(null);
+  const [token, setToken] = useState<string | null>();
+
 
   useEffect(() => {
     // Auto-focus first input on mount
     inputRefs.current[0]?.focus();
   }, []);
 
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
-      return () => clearTimeout(timer);
+  const getUserData = async (token: string) => {
+    try {
+      const response = await api.post('/auth/get-token-data', {
+        token,
+      });
+
+      if (!response) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      setUserData(response.data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      throw error;
     }
-  }, [resendCooldown]);
+  };
 
   const handleInputChange = (index: number, value: string) => {
     // Only allow numbers
@@ -50,7 +64,7 @@ export default function EmailVerificationPage() {
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").slice(0, 6);
-    
+
     if (!/^\d+$/.test(pastedData)) return;
 
     const newOtp = [...otp];
@@ -97,7 +111,7 @@ export default function EmailVerificationPage() {
   const handleResend = async () => {
     setResendCooldown(60);
     setError("");
-    
+
     try {
       // TODO: Implement actual resend OTP API call
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -105,6 +119,16 @@ export default function EmailVerificationPage() {
       setError("Failed to resend code. Please try again.");
     }
   };
+
+
+  // On page load
+  useEffect(() => {
+    const urlToken = new URLSearchParams(window.location.search).get('token');
+    getUserData(urlToken as string).catch(console.error);
+
+  }, []);
+  // On page load
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 relative overflow-hidden">
@@ -161,9 +185,9 @@ export default function EmailVerificationPage() {
                 )}
 
                 {/* Submit Button */}
-                <Button 
-                  type="submit" 
-                  className="w-full" 
+                <Button
+                  type="submit"
+                  className="w-full"
                   disabled={isLoading || otp.join("").length !== 6}
                 >
                   {isLoading ? (
